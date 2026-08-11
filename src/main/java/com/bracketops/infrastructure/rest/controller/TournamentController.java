@@ -25,23 +25,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import com.bracketops.application.command.handler.UpdateTournamentCommandHandler;
+import com.bracketops.application.dto.UpdateTournamentCommand;
+import org.springframework.web.bind.annotation.PutMapping;
+
 @RestController
 @RequestMapping("/api/v1/tournaments")
 @Tag(name = "Tournaments", description = "Esports Tournament Lifecycle Management REST API (CQRS)")
 public class TournamentController {
 
     private final CreateTournamentCommandHandler createCommandHandler;
+    private final UpdateTournamentCommandHandler updateCommandHandler;
     private final GenerateBracketCommandHandler generateBracketCommandHandler;
     private final CancelTournamentCommandHandler cancelCommandHandler;
     private final DeleteTournamentCommandHandler deleteCommandHandler;
     private final TournamentQueryHandler queryHandler;
 
     public TournamentController(CreateTournamentCommandHandler createCommandHandler,
+                                UpdateTournamentCommandHandler updateCommandHandler,
                                 GenerateBracketCommandHandler generateBracketCommandHandler,
                                 CancelTournamentCommandHandler cancelCommandHandler,
                                 DeleteTournamentCommandHandler deleteCommandHandler,
                                 TournamentQueryHandler queryHandler) {
         this.createCommandHandler = createCommandHandler;
+        this.updateCommandHandler = updateCommandHandler;
         this.generateBracketCommandHandler = generateBracketCommandHandler;
         this.cancelCommandHandler = cancelCommandHandler;
         this.deleteCommandHandler = deleteCommandHandler;
@@ -54,6 +61,26 @@ public class TournamentController {
     public ResponseEntity<TournamentResponseDto> createTournament(@Valid @RequestBody CreateTournamentCommand command) {
         TournamentResponseDto created = createCommandHandler.handle(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update tournament details (Command / PUT - Requires ROLE_ADMIN)")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<TournamentResponseDto> updateTournament(
+            @PathVariable String id,
+            @RequestBody UpdateTournamentCommand command) {
+        UpdateTournamentCommand commandWithId = new UpdateTournamentCommand(
+                id,
+                command.name(),
+                command.gameName(),
+                command.format(),
+                command.maxTeams(),
+                command.playersPerTeam(),
+                command.prizePool(),
+                command.bannerUrl()
+        );
+        TournamentResponseDto updated = updateCommandHandler.handle(commandWithId);
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/{id}/generate-bracket")

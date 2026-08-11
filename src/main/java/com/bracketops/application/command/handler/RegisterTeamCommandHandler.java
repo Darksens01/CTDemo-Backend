@@ -5,7 +5,6 @@ import com.bracketops.application.dto.TeamResponseDto;
 import com.bracketops.domain.model.aggregate.Team;
 import com.bracketops.domain.model.aggregate.Tournament;
 import com.bracketops.domain.model.entity.Player;
-import com.bracketops.domain.model.exception.DomainException;
 import com.bracketops.domain.model.exception.ResourceNotFoundException;
 import com.bracketops.domain.model.valueobject.TeamStatus;
 import com.bracketops.domain.port.outbound.TeamRepositoryPort;
@@ -20,7 +19,8 @@ public class RegisterTeamCommandHandler {
     private final TeamRepositoryPort teamRepositoryPort;
     private final TournamentRepositoryPort tournamentRepositoryPort;
 
-    public RegisterTeamCommandHandler(TeamRepositoryPort teamRepositoryPort, TournamentRepositoryPort tournamentRepositoryPort) {
+    public RegisterTeamCommandHandler(TeamRepositoryPort teamRepositoryPort,
+            TournamentRepositoryPort tournamentRepositoryPort) {
         this.teamRepositoryPort = teamRepositoryPort;
         this.tournamentRepositoryPort = tournamentRepositoryPort;
     }
@@ -44,8 +44,7 @@ public class RegisterTeamCommandHandler {
                 command.captainUsername(),
                 TeamStatus.REGISTERED,
                 players,
-                null
-        );
+                null);
 
         Team savedTeam = teamRepositoryPort.save(team);
         tournament.registerTeam(savedTeam.getId());
@@ -56,7 +55,8 @@ public class RegisterTeamCommandHandler {
 
     private TeamResponseDto mapToDto(Team team) {
         List<TeamResponseDto.PlayerResponseDto> playerDtos = team.getPlayers().stream()
-                .map(p -> new TeamResponseDto.PlayerResponseDto(p.getId(), p.getGamerTag(), p.getRealName(), p.getInGameRole()))
+                .map(p -> new TeamResponseDto.PlayerResponseDto(p.getId(), p.getGamerTag(), p.getRealName(),
+                        p.getInGameRole()))
                 .collect(Collectors.toList());
 
         return new TeamResponseDto(
@@ -67,7 +67,6 @@ public class RegisterTeamCommandHandler {
                 team.getCaptainUsername(),
                 team.getStatus().name(),
                 playerDtos,
-                team.getCreatedAt()
-        );
+                team.getCreatedAt());
     }
 }

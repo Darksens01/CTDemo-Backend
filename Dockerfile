@@ -8,4 +8,5 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
+ENV SPRING_PROFILES_ACTIVE=h2
 ENTRYPOINT ["java", "-jar", "app.jar"]

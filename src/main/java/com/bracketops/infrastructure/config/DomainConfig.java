@@ -20,6 +20,8 @@ import com.bracketops.domain.service.MatchAdvancementEngine;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.bracketops.application.command.handler.UpdateTournamentCommandHandler;
+
 @Configuration
 public class DomainConfig {
 
@@ -38,6 +40,11 @@ public class DomainConfig {
     @Bean
     public CreateTournamentCommandHandler createTournamentCommandHandler(TournamentRepositoryPort tournamentRepositoryPort) {
         return new CreateTournamentCommandHandler(tournamentRepositoryPort);
+    }
+
+    @Bean
+    public UpdateTournamentCommandHandler updateTournamentCommandHandler(TournamentRepositoryPort tournamentRepositoryPort) {
+        return new UpdateTournamentCommandHandler(tournamentRepositoryPort);
     }
 
     @Bean
